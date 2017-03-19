@@ -178,8 +178,82 @@
         </main>
         <!-- 商品大区块 end-->
     </div>
+    <script src="js/zepto/zepto.min.js"></script>
+    <script src="js/zepto/selector.js"></script>
+    <script src="js/zepto/fx.js"></script>
+    <script src="js/zepto/touch.js"></script>
+    <script>
+        $(function(){
+            /*轮播图*/
+            var $banner = $('.jd_banner');
 
-    <script src="js/common.js"></script>
-    <script src="js/index.js"></script>
+            var width = $banner.width();
+
+            /*扩展性的选择器 直接使用不行  记得引入selector模块*/
+            var $imageBox = $banner.find('ul:first');
+
+            var $pointBox = $banner.find('ul:last');
+
+            var $points = $pointBox.find('li');
+
+            /*动画的公用方法*/
+            var animateFuc = function(callback){
+                $imageBox.animate({"transform":"translateX("+(-index*width)+"px)"},200,'ease',function(){
+                    /*动画结束*/
+                    if(index >= 9){
+                        index = 1;
+                        /*瞬间定位*/
+                        $imageBox.css({"transform":"translateX("+(-index*width)+"px)"});
+                    }else if(index <= 0){
+                        index = 8;
+                        /*瞬间定位*/
+                        $imageBox.css({"transform":"translateX("+(-index*width)+"px)"});
+                    }
+                    /*设置点*/
+                    $points.removeClass('now').eq(index-1).addClass('now');
+                    /*动画结束的事件加上定时器*/
+                    callback && callback();
+                });
+            };
+
+            /*轮播*/
+            var index = 1;
+            var timer = setInterval(function(){
+                index ++;
+                /*做动画*/
+                animateFuc();
+            },5000);
+
+            /*滑动  只有滑动手势*/
+            $imageBox.on('swipeLeft',function(){
+                clearInterval(timer);
+                index ++ ;
+                animateFuc(function(){
+                    clearInterval(timer);
+                    timer = setInterval(function(){
+                        index ++;
+                        /*做动画*/
+                        animateFuc();
+                    },5000);
+                });
+            });
+            $imageBox.on('swipeRight',function(){
+                clearInterval(timer);
+                index --;
+                animateFuc(function(){
+                    clearInterval(timer);
+                    timer = setInterval(function(){
+                        index ++;
+                        /*做动画*/
+                        animateFuc();
+                    },5000);
+                });
+            });
+
+
+
+
+        });
+    </script>
 </body>
 </html>
